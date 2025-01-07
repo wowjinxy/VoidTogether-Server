@@ -1,5 +1,6 @@
 import { ServerModule } from '../moduleHandler.js';
 import { Modules, Config } from '../../server.js';
+import chalk from 'chalk';
 
 export default class AuthModule extends ServerModule {
     async LoadModule() {
@@ -20,6 +21,20 @@ export default class AuthModule extends ServerModule {
             }
         }
 
+        // Machine Id is REQUIRED
+        if (!data.machine || data.machine.length != 64) {
+            this.Log("Bad machine");
+            ws.close();
+            return;
+        }
+
+        // Player Count Shit
+        if (Modules.Player.ActivePlayerStructs.length + 1 > Config.information.maxPlayers && !Modules.Permissions.CheckUserPermission(data.machine, "VoidTogether.ReservedSlot")) {
+            this.Log("Too many players");
+            ws.close();
+            return;
+        }
+
         // Require a username.
         if (!data.username) {
             this.Log("No username");
@@ -30,13 +45,6 @@ export default class AuthModule extends ServerModule {
         // Prevent Out of Date Clients as well
         if (!data.version || data.version != Config.information.clientVersion) {
             this.Log("No version");
-            ws.close();
-            return;
-        }
-
-        // Machine Id is REQUIRED
-        if (!data.machine || data.machine.length != 64) {
-            this.Log("Bad machine");
             ws.close();
             return;
         }
@@ -69,10 +77,5 @@ export default class AuthModule extends ServerModule {
 
         // Notify All Players
         Modules.Chat.BroadcastMessage("<yellow>[Joined]</>", `<yellow>${NewUser.username} (${Modules.Player.ActivePlayerStructs.length} Online)</>`);
-
-        // Notify Admins they exist
-        if (NewUser.isAdmin) {
-            Modules.Chat.SendMessage(ws, "<cyan>[Server]</>", "<cyan>Administrative Privileges Granted.</>");
-        }
     }
 }

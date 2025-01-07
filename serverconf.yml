@@ -5,14 +5,14 @@ properties:
     # This is the Message that is Displayed alongside your server.
     motd: "This is a Server MOTD"
     # This is the Client Version required to join
-    clientVersion: "1.0.0"
+    clientVersion: "0.0.1"
     # Specify a Host IP, optional, can be left blank
     host: 
     # The port that the server is hosted on
     port: 42069
     # The maximum number of players
     maxPlayers: 20
-    # The Map used in unreal engine. untitled0 for the normal map, MP_Construct for sandbox.
+    # The Map used in unreal engine. untitled_1 for the normal map (NOT SUPPORTED FULLY YET), MP_Construct for sandbox.
     defaultMap: "MP_Construct"
     # The Password Required to Connect to this Server. Leave blank to allow anyone to connect.
     password: 
@@ -21,7 +21,9 @@ properties:
     # Tickrate - Highly recommend to keep this at 10
     tickRate: 10
     # No Socket Response Timeout, in milliseconds
-    socketTimeout: 60000
+    socketTimeout: 30000
+    # Specify how many minutes until the Server restarts
+    autoRestartTimer: 60
   gameplay:
     # Specifies how long in-game days should last, in minutes
     dayLength: 75
@@ -32,3 +34,5 @@ properties:
     clientId: 
     # The Discord Bot Token of your Application. To Disable Discord Integration, leave the Bot Token blank
     botToken: 
+    # The Webhook URL used by your Discord Server's Logging Channel, leave Blank to disable
+    webhook: 

@@ -84,4 +84,17 @@ export default class PermissionsModule extends ServerModule {
         }
         return false;
     }
+
+    GetUserPermissions = (machineId) => {
+        let permsList = this.GetPermissionsList();
+        if (permsList == {}) 
+            return [];
+
+        if (permsList[machineId] == null) {
+            machineId = "default";
+            if (permsList[machineId] == null)
+                return [];
+        }
+        return permsList[machineId];
+    }
 }

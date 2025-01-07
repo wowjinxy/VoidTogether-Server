@@ -23,6 +23,9 @@ export default class TickModule extends ServerModule {
         // Afterwards, Update the Last Tick Time
         this.lastUpdate = Date.now();
 
+        // Update the Game Runtime/Uptime Handler
+        Modules.Uptime.HandleTickUptime();
+
         // Update the Game's current Time of Day, Weather, Etc.
         Modules.Time.UpdateCycle(deltaTime);
 

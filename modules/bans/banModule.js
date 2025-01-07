@@ -22,7 +22,7 @@ export default class BanModule extends ServerModule {
     WriteBanList = (newBanList, filePath = "./banList.json") => {
         fs.writeFileSync(filePath, JSON.stringify({
             bans: newBanList ? newBanList : []
-        }));
+        }, null, 4));
     }
 
     BanMachineId = (machineId, lastUsername, reason) => {
@@ -37,7 +37,7 @@ export default class BanModule extends ServerModule {
             lastUsername: lastUsername,
             reason: reason
         });
-        WriteBanList(banList);
+        this.WriteBanList(banList);
     }
 
     UnbanMachineId = (machineId) => {
@@ -48,7 +48,7 @@ export default class BanModule extends ServerModule {
                 newBanList.push(banList[i]);
             }
         }
-        WriteBanList(newBanList);
+        this.WriteBanList(newBanList);
     }
 
     CheckMachineBanned = (machineId) => {

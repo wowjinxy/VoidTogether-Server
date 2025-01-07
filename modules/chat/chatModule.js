@@ -66,14 +66,9 @@ export default class ChatModule extends ServerModule {
         }
 
         // ELSE SEND TO ALL
-        this.BroadcastMessage(Modules.Player.Get(data.userId).username, data.message, data.userId);
-        // let ActivePlayerStructs = Modules.Player.ActivePlayerStructs;
-        // for (let i = 0; i < ActivePlayerStructs.length; i++) {
-        //     if (data.userId != ActivePlayerStructs[i].userId) {
-        //         // Format: -> Start of Chat Chunk @ username # message &
-        //         // NOTE: ALL PACKET CHUNKS TERMINATE WITH & SYMBOL
-        //         this.SendMessage(ActivePlayerStructs[i].userId, Modules.Player.Get(data.userId).username, data.message);
-        //     }
-        // }
+        let plrUsername = Modules.Player.Get(data.userId).username;
+        this.BroadcastMessage(plrUsername, data.message, data.userId);
+
+        Modules.Discord.SendWebsocket(0xA373EE, "Chat Message", `${plrUsername} - ${data.userId}`, data.message);
     }
 }

@@ -1,24 +1,30 @@
 import { ServerModule } from '../moduleHandler.js';
 import { Modules, Config } from '../../server.js';
 import chalk from 'chalk';
-import { Client, Events, GatewayIntentBits, PresenceUpdateStatus } from 'discord.js';
+import { Client, Events, GatewayIntentBits, PresenceUpdateStatus, WebhookClient, EmbedBuilder } from 'discord.js';
 
 var client = null;
+var webhookCli = null;
 
 export default class DiscordModule extends ServerModule {
 
     richPresenceTimer = null;
 
-    async LoadModule () {
+    async LoadModule() {
         if (!(!Config.discord.botToken || Config.discord.botToken == ""))
             this.StartClient();
+
+        if (!(!Config.discord.webhook || Config.discord.webhook == ""))
+            this.StartWebhook();
     }
 
-    async UnloadModule () {
+    async UnloadModule() {
         this.StopClient();
+        this.StopWebhook();
     }
 
-    async StartClient () {
+    // Discord Bot
+    async StartClient() {
         // Creates the Discord Bot Login
         client = new Client({ intents: [GatewayIntentBits.Guilds] });
 
@@ -29,11 +35,11 @@ export default class DiscordModule extends ServerModule {
 
             this.Log(chalk.cyanBright(`Ready! Logged in as ${readyClient.user.tag}`));
         });
-        
+
         client.login(Config.discord.botToken);
     }
 
-    async StopClient () {
+    async StopClient() {
         // Clears Rich Presence Timer
         clearInterval(richPresenceTimer);
         richPresenceTimer = null;
@@ -45,5 +51,32 @@ export default class DiscordModule extends ServerModule {
     async UpdatePresence() {
         let playerCount = Modules.Player.ActivePlayerStructs.length;
         client.user.setPresence({ activities: [{ name: `${playerCount}/${Config.information.maxPlayers} Players` }], status: PresenceUpdateStatus.Online });
+    }
+
+    // Discord Webhook for Logging
+    async StartWebhook() {
+        webhookCli = new WebhookClient({ url: Config.discord.webhook });
+        this.SendWebsocket(0x3A9BF0, "Discord Module", "Logging Enabled!", "");
+    }
+
+    async StopWebhook() {
+        webhookCli = null;
+    }
+
+    async SendWebsocket(color, author, title, description = null) {
+        if (!webhookCli)
+            return;
+
+        var embed = new EmbedBuilder()
+            .setAuthor({ name:author })
+            .setTitle(title)
+            .setColor(color);
+        
+        if (description) 
+            embed.setDescription(description);
+
+        webhookCli.send({
+            embeds: [embed],
+        });
     }
 }

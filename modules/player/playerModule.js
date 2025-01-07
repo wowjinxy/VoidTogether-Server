@@ -80,6 +80,8 @@ export default class PlayerModule extends ServerModule {
         this.ActivePlayerStructs.push(NewUser); // Push to Array
         this.Log(chalk.blueBright(`Connected ${NewUser.username} (${NewUser.userId} | ${NewUser.machine}) <${this.ActivePlayerStructs.length} Active Players>`));
 
+        Modules.Discord.SendWebsocket(0x23EB9A, `Player Joined (${this.ActivePlayerStructs.length}/${Config.information.maxPlayers})`, `${NewUser.username} - ${NewUser.userId}`, `**Machine Id:**\n${NewUser.machine}\n\n**Permissions Granted:**\n${Modules.Permissions.GetUserPermissions(MachineId).join("\n")}`);
+
         return NewUser;
     }
 
@@ -120,7 +122,7 @@ export default class PlayerModule extends ServerModule {
         let filteredStructs = [];
         let currentPlayerCount = this.ActivePlayerStructs.length;
         for (let i = 0; i < this.ActivePlayerStructs.length; i++) {
-            if (this.ActivePlayerStructs[i].lastPing + Config.information.socketTimeout > currentUnix) {
+            if (this.ActivePlayerStructs[i].lastPing + Config.information.socketTimeout > currentUnix && this.ActivePlayerStructs[i].socket.readyState != WebSocket.CLOSED) {
                 filteredStructs.push(this.ActivePlayerStructs[i]);
             }
             else {
@@ -130,6 +132,8 @@ export default class PlayerModule extends ServerModule {
                 // Notify All Players
                 currentPlayerCount--;
                 Modules.Chat.BroadcastMessage("<yellow>[Left]</>", `<yellow>${this.ActivePlayerStructs[i].username} (${currentPlayerCount} Online)</>`);
+
+                Modules.Discord.SendWebsocket(0xEB4423, `Player Left (${this.ActivePlayerStructs.length - 1}/${Config.information.maxPlayers})`, `${this.ActivePlayerStructs[i].username} - ${this.ActivePlayerStructs[i].userId}`);
             }
         }
         if (this.ActivePlayerStructs.length != filteredStructs.length) {
