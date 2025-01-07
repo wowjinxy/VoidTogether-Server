@@ -52,7 +52,7 @@ However, if you want control and moderation for your server, you don't want a to
 
 If you want to give yourself every permission you would use the wildcard (aka "I have all permissions under this group of permissions"), symbolized by the `*`. This means if you want all VoidTogether permissions only, you do `VoidTogether.*`.
 
-Here is an example where I give a Reserved Slot (The ability to join when the server is full) to a player (The hash is just HawkTuah, do not use this hash, use your own)
+Here is an example where I give a Reserved Slot (The ability to join when the server is full) to a player.
 ```json
 {
     "users": {
