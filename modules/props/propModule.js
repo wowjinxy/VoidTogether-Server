@@ -120,7 +120,7 @@ export default class PropModule extends ServerModule {
                 this.ActiveProps[PropIndex].rotation = data.props[i].rotation;
                 this.ActiveProps[PropIndex].scale = data.props[i].scale;
                 this.ActiveProps[PropIndex].velocity = data.props[i].velocity;
-                this.ActiveProps[PropIndex].lastOwner = data.props[i].userId;
+                this.ActiveProps[PropIndex].lastOwner = data.userId;
                 this.ActiveProps[PropIndex].isLocked = data.props[i].isLocked;
 
                 if (!(!data.props[i].data || data.props[i].data == undefined || data.props[i].data == "")) {
