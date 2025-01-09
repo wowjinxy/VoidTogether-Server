@@ -1,4 +1,6 @@
 # VoidTogether-Server (NodeJS)
+[![NodeJS](https://img.shields.io/badge/Node.js-6DA55F?logo=node.js&logoColor=white)](#)‎ ‎ '‎ ‎ [![GitHub license](https://img.shields.io/github/license/VoidTogether/VoidTogether-Server?label=License&labelColor=ff903b&color=c9783a)](https://github.com/VoidTogether/VoidTogether-Server/blob/main/LICENSE) ‎ '‎ ‎ [![Discord](https://img.shields.io/discord/1291130292425195570?logo=discord&label=Discord&logoColor=white&labelColor=7674FA&color=9092E7)](https://discord.gg/voidtogether)  ‎ '‎ ‎ [![KoFi](https://img.shields.io/badge/Ko--fi-F16061?logo=ko-fi&logoColor=white)](https://ko-fi.com/gatodev)
+
 Simple, Semi-RPC-Based Multiplayer Mod Server Handler, responsible for Networking Players, Props, and more.
 
 Oh, yeah, and its written in NodeJS, using Websockets.
