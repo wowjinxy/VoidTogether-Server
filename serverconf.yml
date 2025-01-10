@@ -5,7 +5,7 @@ properties:
     # This is the Message that is Displayed alongside your server.
     motd: "This is a Server MOTD"
     # This is the Client Version required to join
-    clientVersion: "0.0.1"
+    clientVersion: "0.0.2"
     # Specify a Host IP, optional, can be left blank
     host: 
     # The port that the server is hosted on

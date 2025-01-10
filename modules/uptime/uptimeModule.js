@@ -26,8 +26,8 @@ export default class UptimeModule extends ServerModule {
             this.restarting = true;
             this.Log(chalk.yellowBright("SERVER IS RESTARTING AUTOMATICALLY"));
             Modules.Discord.SendWebsocket(0xF59B42, `Uptime Module`, `Server is Now Restarting Automatically!`);
-            
-            RestartServer();
+            Modules.Chat.BroadcastMessage("<orange>[Server]</>", `<orange>Server restarting...</>`);
+            setTimeout(RestartServer,200);
         }
 
         // Warning
@@ -35,6 +35,7 @@ export default class UptimeModule extends ServerModule {
             this.restartWarning = true;
             this.Log(chalk.yellowBright("SERVER RESTARTING IN ONE MINUTE AUTOMATICALLY"));
             Modules.Discord.SendWebsocket(0xF59B42, `Uptime Module`, `Server is Restarting Automatically in 1 Minute!`);
+            Modules.Chat.BroadcastMessage("<orange>[Server]</>", `<orange>Server will restart in 1 minute...</>`);
         }
     }
 }

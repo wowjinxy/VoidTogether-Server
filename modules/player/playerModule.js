@@ -1,5 +1,6 @@
 import { ServerModule } from '../moduleHandler.js';
 import { Modules, Config } from '../../server.js';
+import { WebSocket } from 'ws';
 import chalk from 'chalk';
 
 export default class PlayerModule extends ServerModule {
@@ -160,9 +161,11 @@ export default class PlayerModule extends ServerModule {
 
         // Send update to client
         this.ActivePlayerStructs[plrIndex].socket.send(JSON.stringify({
-            requestType: "function",
-            data: `#function&teleport&${posX}&${posY}&${posZ}`
-        }))
+            requestType: "teleportPlayer",
+            X: posX,
+            Y: posY,
+            Z: posZ,
+        }));
     }
 
     SetPlayerScale(userId, newScale = 1) {
@@ -174,8 +177,10 @@ export default class PlayerModule extends ServerModule {
 
         // Send update to client
         this.ActivePlayerStructs[plrIndex].socket.send(JSON.stringify({
-            requestType: "function",
-            data: `#function&size&${newScale}`
+            requestType: "resizePlayer",
+            X: newScale,
+            Y: newScale,
+            Z: newScale,
         }))
     }
 }

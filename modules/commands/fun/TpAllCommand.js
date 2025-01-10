@@ -27,7 +27,7 @@ export default
             
             for (let i = 0; i < ActivePlayerStructs.length; i++) {
                 if (ActivePlayerStructs[i].userId != userId) {
-                    PlayerModule.TeleportPlayer(ActivePlayerStructs[i].userId,ActivePlayerStructs[SenderUserId].position[0],ActivePlayerStructs[SenderUserId].position[1],ActivePlayerStructs[SenderUserId].position[2]);
+                    PlayerModule.TeleportPlayer(ActivePlayerStructs[i].userId,ActivePlayerStructs[SenderUserId].position.X,ActivePlayerStructs[SenderUserId].position.Y,ActivePlayerStructs[SenderUserId].position.Z);
                     ChatModule.SendMessage(ActivePlayerStructs[i].socket, "<yellow>[Server]</>", `<yellow>You were teleported by ${SenderUsername}</>`);
                 }
             }

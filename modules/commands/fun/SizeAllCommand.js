@@ -1,4 +1,5 @@
 import { Modules, Config } from '../../../server.js';
+import chalk from "chalk";
 
 export default
     {
@@ -36,7 +37,10 @@ export default
                 PlayerModule.SetPlayerScale(ActivePlayerStructs[i].userId, Modules.Utility.Clamp(parseFloat(Params[Params.length - 1]), 0.25, 5));
                 ChatModule.SendMessage(ActivePlayerStructs[i].socket, "<yellow>[Server]</>", `<yellow>You were resized by ${SenderUsername}</>`);
             }
-            ChatModule.SendMessage(ws, "<green>[Server]</>", `<green>Resized all players.</>`);
-            Modules.Command.Log(chalk.green("Resized all players."));
+
+            if (isConsole)
+                Modules.Command.Log(chalk.green("Resized all players."));
+            else
+                ChatModule.SendMessage(ws, "<green>[Server]</>", `<green>Resized all players.</>`);
         }
     };

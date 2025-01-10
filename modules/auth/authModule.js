@@ -15,7 +15,7 @@ export default class AuthModule extends ServerModule {
         // Check the Password
         if (Config.information.password && Config.information.password != "") {
             if (Config.information.password != data.password) {
-                this.Log("No username");
+                this.Log("Wrong Password");
                 ws.close();
                 return;
             }
