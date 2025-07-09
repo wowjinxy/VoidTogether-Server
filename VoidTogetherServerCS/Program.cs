@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Windows.Forms;
 using Fleck;
 using System.Text.Json;
 using YamlDotNet.Serialization;
@@ -18,21 +19,20 @@ class Player
 
 class Program
 {
-    static ServerConfig Config;
-    static List<Player> Players = new();
-    static int NextUserId = 0;
+    internal static ServerConfig Config;
+    internal static List<Player> Players = new();
+    internal static int NextUserId = 0;
+    static WebSocketServer? _server;
+    static Action? _log;
+    static Action? _updatePlayers;
 
+    [STAThread]
     static void Main(string[] args)
     {
         Config = LoadConfig();
-
-        FleckLog.Level = LogLevel.Info;
-        string host = string.IsNullOrEmpty(Config.properties.information.host) ? "0.0.0.0" : Config.properties.information.host;
-        var server = new WebSocketServer($"ws://{host}:{Config.properties.information.port}");
-        server.Start(socket => HandleSocket(socket));
-
-        Console.WriteLine($"Server running on {host}:{Config.properties.information.port}");
-        Console.ReadLine();
+        Application.EnableVisualStyles();
+        Application.SetCompatibleTextRenderingDefault(false);
+        Application.Run(new MainForm());
     }
 
     static ServerConfig LoadConfig()
@@ -44,6 +44,32 @@ class Program
         return deserializer.Deserialize<ServerConfig>(yaml);
     }
 
+    internal static void StartServer(Action<string> log, Action updatePlayers)
+    {
+        _log = log;
+        _updatePlayers = updatePlayers;
+        FleckLog.Level = LogLevel.Info;
+        string host = string.IsNullOrEmpty(Config.properties.information.host) ? "0.0.0.0" : Config.properties.information.host;
+        _server = new WebSocketServer($"ws://{host}:{Config.properties.information.port}");
+        _server.Start(socket => HandleSocket(socket));
+        log($"Server running on {host}:{Config.properties.information.port}");
+    }
+
+    internal static void StopServer()
+    {
+        if (_server != null)
+        {
+            _server.Dispose();
+            _server = null;
+        }
+        lock (Players)
+        {
+            foreach (var p in Players)
+                p.Socket.Close();
+            Players.Clear();
+        }
+    }
+
     static void HandleSocket(IWebSocketConnection socket)
     {
         Player player = null;
@@ -53,7 +79,8 @@ class Program
             if (player != null)
             {
                 lock (Players) Players.Remove(player);
-                Console.WriteLine($"Player {player.Username} disconnected");
+                _log?.Invoke($"Player {player.Username} disconnected");
+                _updatePlayers?.Invoke();
             }
         };
     }
@@ -86,6 +113,11 @@ class Program
                 case "join":
                     if (!HandleJoin(socket, root, out player))
                         socket.Close();
+                    else
+                    {
+                        _log?.Invoke($"Player {player.Username} connected");
+                        _updatePlayers?.Invoke();
+                    }
                     break;
                 case "update":
                     // Example: store last ping
@@ -98,7 +130,7 @@ class Program
         }
         catch (Exception ex)
         {
-            Console.WriteLine(ex);
+            _log?.Invoke(ex.ToString());
         }
     }
 
@@ -129,5 +161,28 @@ class Program
         var auth = new { requestType = "auth", userId = player.UserId, userSecret = player.UserSecret, tickRate = Config.properties.information.tickRate };
         socket.Send(JsonSerializer.Serialize(auth));
         return true;
+    }
+
+    internal static void ExecuteCommand(string command, Action<string> log)
+    {
+        var parts = command.Split(' ', 2, StringSplitOptions.RemoveEmptyEntries);
+        if (parts.Length == 0) return;
+        switch (parts[0].ToLower())
+        {
+            case "list":
+                lock (Players)
+                {
+                    foreach (var p in Players)
+                        log(p.Username);
+                }
+                break;
+            case "stop":
+                StopServer();
+                log("Server stopped");
+                break;
+            default:
+                log($"Unknown command: {parts[0]}");
+                break;
+        }
     }
 }
