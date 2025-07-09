@@ -23,7 +23,7 @@ class Program
     internal static List<Player> Players = new();
     internal static int NextUserId = 0;
     static WebSocketServer? _server;
-    static Action? _log;
+    static Action<string>? _log;
     static Action? _updatePlayers;
 
     [STAThread]
