@@ -1,16 +1,16 @@
-# VoidTogether-Server (NodeJS)
-[![NodeJS](https://img.shields.io/badge/Node.js-6DA55F?logo=node.js&logoColor=white)](#)‎ ‎ '‎ ‎ [![GitHub license](https://img.shields.io/github/license/VoidTogether/VoidTogether-Server?label=License&labelColor=ff903b&color=c9783a)](https://github.com/VoidTogether/VoidTogether-Server/blob/main/LICENSE) ‎ '‎ ‎ [![Discord](https://img.shields.io/discord/1291130292425195570?logo=discord&label=Discord&logoColor=white&labelColor=7674FA&color=9092E7)](https://discord.gg/voidtogether)  ‎ '‎ ‎ [![KoFi](https://img.shields.io/badge/Ko--fi-F16061?logo=ko-fi&logoColor=white)](https://ko-fi.com/gatodev)
+# VoidTogether-Server (C#)
+[![.NET](https://img.shields.io/badge/.NET-512BD4?logo=dotnet&logoColor=white)](#) [![GitHub license](https://img.shields.io/github/license/VoidTogether/VoidTogether-Server?label=License&labelColor=ff903b&color=c9783a)](https://github.com/VoidTogether/VoidTogether-Server/blob/main/LICENSE) [![Discord](https://img.shields.io/discord/1291130292425195570?logo=discord&label=Discord&logoColor=white&labelColor=7674FA&color=9092E7)](https://discord.gg/voidtogether) [![KoFi](https://img.shields.io/badge/Ko--fi-F16061?logo=ko-fi&logoColor=white)](https://ko-fi.com/gatodev)
 
 Simple, Semi-RPC-Based Multiplayer Mod Server Handler, responsible for Networking Players, Props, and more.
 
-Oh, yeah, and its written in NodeJS, using Websockets.
+This version is written in C# using Fleck for websockets.
 
 **WARNING: THIS IS UNFINISHED, AND ONLY FOR THE VOIDTOGETHER SANDBOX CONCEPT DEMO**
 
 ## Pre-Requisites:
 - Knowing Port Forwarding
-- Having a Machine that can reasonably run NodeJS
-- Any Relatively New Installation of NodeJS, [you can download it here](https://nodejs.org/en/download)
+- Having a Machine that can reasonably run the .NET runtime
+- Any relatively new installation of the .NET SDK, [download here](https://dotnet.microsoft.com/download)
 - Strong Ethernet Connection
 
 ## Installing the Server
@@ -20,9 +20,9 @@ Oh, yeah, and its written in NodeJS, using Websockets.
 
 3. Shift + Right Click on the empty space below the extracted files in your file browser and click "Open Powershell window here"
 
-4. In the Powershell Terminal that has opened, type in the command `npm i`. This is required to install all the NodeJS Modules required by the server.
+4. In the Powershell Terminal that has opened, run `dotnet restore`.
 
-5. Now, whenever you want to Run your Server, open the Powershell Window and run `npm start`.
+5. Now, whenever you want to run your server, execute `dotnet run` inside the `VoidTogetherServerCS` folder.
   
 If you have any issues, reinstall your Server, and try deleting the `consoleModule.js` in `./modules/console/` if a Docker container refuses to load beyond the Commands Module.
 

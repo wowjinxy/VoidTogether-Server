@@ -1,0 +1,133 @@
+using System;
+using System.IO;
+using Fleck;
+using System.Text.Json;
+using YamlDotNet.Serialization;
+using YamlDotNet.Serialization.NamingConventions;
+using System.Collections.Generic;
+using System.Threading;
+
+class Player
+{
+    public string UserId { get; set; }
+    public string UserSecret { get; set; }
+    public string Username { get; set; }
+    public string Machine { get; set; }
+    public IWebSocketConnection Socket { get; set; }
+}
+
+class Program
+{
+    static ServerConfig Config;
+    static List<Player> Players = new();
+    static int NextUserId = 0;
+
+    static void Main(string[] args)
+    {
+        Config = LoadConfig();
+
+        FleckLog.Level = LogLevel.Info;
+        string host = string.IsNullOrEmpty(Config.properties.information.host) ? "0.0.0.0" : Config.properties.information.host;
+        var server = new WebSocketServer($"ws://{host}:{Config.properties.information.port}");
+        server.Start(socket => HandleSocket(socket));
+
+        Console.WriteLine($"Server running on {host}:{Config.properties.information.port}");
+        Console.ReadLine();
+    }
+
+    static ServerConfig LoadConfig()
+    {
+        var deserializer = new DeserializerBuilder()
+            .WithNamingConvention(CamelCaseNamingConvention.Instance)
+            .Build();
+        var yaml = File.ReadAllText("../serverconf.yml");
+        return deserializer.Deserialize<ServerConfig>(yaml);
+    }
+
+    static void HandleSocket(IWebSocketConnection socket)
+    {
+        Player player = null;
+        socket.OnMessage = message => OnMessage(socket, ref player, message);
+        socket.OnClose = () =>
+        {
+            if (player != null)
+            {
+                lock (Players) Players.Remove(player);
+                Console.WriteLine($"Player {player.Username} disconnected");
+            }
+        };
+    }
+
+    static void OnMessage(IWebSocketConnection socket, ref Player player, string msg)
+    {
+        try
+        {
+            using var doc = JsonDocument.Parse(msg);
+            var root = doc.RootElement;
+            if (!root.TryGetProperty("requestType", out var typeElement)) return;
+            var type = typeElement.GetString();
+            switch (type)
+            {
+                case "info":
+                    var info = new
+                    {
+                        title = Config.properties.information.name,
+                        motd = Config.properties.information.motd,
+                        version = Config.properties.information.clientVersion,
+                        maxOnline = Config.properties.information.maxPlayers,
+                        online = Players.Count
+                    };
+                    socket.Send(JsonSerializer.Serialize(info));
+                    socket.Close();
+                    break;
+                case "ping":
+                    socket.Send("{}");
+                    break;
+                case "join":
+                    if (!HandleJoin(socket, root, out player))
+                        socket.Close();
+                    break;
+                case "update":
+                    // Example: store last ping
+                    if (player != null)
+                    {
+                        // here you could process player position
+                    }
+                    break;
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex);
+        }
+    }
+
+    static bool HandleJoin(IWebSocketConnection socket, JsonElement data, out Player player)
+    {
+        player = null;
+        string password = data.GetProperty("password").GetString();
+        string machine = data.GetProperty("machine").GetString();
+        string username = data.GetProperty("username").GetString();
+        string version = data.GetProperty("version").GetString();
+
+        if (!string.IsNullOrEmpty(Config.properties.information.password) && password != Config.properties.information.password)
+            return false;
+        if (string.IsNullOrEmpty(machine) || machine.Length != 64)
+            return false;
+        if (string.IsNullOrEmpty(username))
+            return false;
+        if (version != Config.properties.information.clientVersion)
+            return false;
+        if (Players.Count >= Config.properties.information.maxPlayers)
+            return false;
+
+        var id = Interlocked.Increment(ref NextUserId);
+        var secret = Guid.NewGuid().ToString("N");
+        player = new Player { UserId = id.ToString(), UserSecret = secret, Username = username, Machine = machine, Socket = socket };
+        lock (Players) Players.Add(player);
+
+        var auth = new { requestType = "auth", userId = player.UserId, userSecret = player.UserSecret, tickRate = Config.properties.information.tickRate };
+        socket.Send(JsonSerializer.Serialize(auth));
+        return true;
+    }
+}
